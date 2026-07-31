@@ -1,11 +1,21 @@
-name: mouja-digital
+name: mouja-digital-bot
 
 services:
-  - name: mouja-api
+  - name: bot
     type: web
+    git:
+      branch: main
+
     ports:
       - port: 8000
+        protocol: http
+
+    env:
+      - key: BOT_TOKEN
+        secret: BOT_TOKEN
+
     build:
       dockerfile: Dockerfile
+
     run:
       command: python app.py
