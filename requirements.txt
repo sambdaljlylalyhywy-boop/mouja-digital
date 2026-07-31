@@ -1,8 +1,9 @@
-iogram==3.17.0
+aiogram==3.17.0
 fastapi==0.115.8
 uvicorn[standard]
 sqlalchemy
 aiosqlite
 python-dotenv
+pydantic-settings
 httpx
 pytest
