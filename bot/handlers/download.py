@@ -1,7 +1,6 @@
 from aiogram import Router
 from aiogram.types import Message
-
-from bot.services.downloader import download_media
+from bot.keyboards.download import download_keyboard
 
 
 router = Router()
@@ -17,23 +16,11 @@ async def link_handler(message: Message):
 
     if text.startswith(("http://", "https://")):
 
-        status = await message.answer(
-            "⏳ جاري تحميل الرابط..."
+        await message.answer(
+            "🔗 تم استلام الرابط\n\n"
+            "اختر نوع التحميل:",
+            reply_markup=download_keyboard()
         )
-
-        try:
-            file_path = download_media(text)
-
-            await message.answer_document(
-                document=open(file_path, "rb")
-            )
-
-            await status.delete()
-
-        except Exception as e:
-            await status.edit_text(
-                f"❌ حدث خطأ:\n{e}"
-            )
 
     else:
         await message.answer(
