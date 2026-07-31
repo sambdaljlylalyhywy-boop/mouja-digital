@@ -1,3 +1,4 @@
+from bot.handlers.callbacks import user_links
 from aiogram import Router
 from aiogram.types import Message
 from bot.keyboards.download import download_keyboard
@@ -16,11 +17,13 @@ async def link_handler(message: Message):
 
     if text.startswith(("http://", "https://")):
 
-        await message.answer(
-            "🔗 تم استلام الرابط\n\n"
-            "اختر نوع التحميل:",
-            reply_markup=download_keyboard()
-        )
+       user_links[message.from_user.id] = text
+
+await message.answer(
+    "🔗 تم استلام الرابط\n\n"
+    "اختر نوع التحميل:",
+    reply_markup=download_keyboard()
+)
 
     else:
         await message.answer(
