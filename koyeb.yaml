@@ -1,0 +1,11 @@
+name: mouja-digital
+
+services:
+  - name: mouja-api
+    type: web
+    ports:
+      - port: 8000
+    build:
+      dockerfile: Dockerfile
+    run:
+      command: python app.py
