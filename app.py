@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 import asyncio
+import traceback
 
 from bot.main import main
-
 
 app = FastAPI(
     title="Mouja Digital Bot",
@@ -21,4 +21,14 @@ async def home():
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(main())
+    print("✅ FastAPI Started")
+
+    async def run_bot():
+        try:
+            print("🚀 Starting Bot...")
+            await main()
+        except Exception as e:
+            print("❌ BOT ERROR:", e)
+            traceback.print_exc()
+
+    asyncio.create_task(run_bot())
