@@ -1,10 +1,10 @@
 import asyncio
 import logging
+import traceback
 
 from aiogram import Bot, Dispatcher
 
 from config.settings import get_settings
-
 from bot.handlers import start, help, download, callbacks
 
 
@@ -15,21 +15,31 @@ logging.basicConfig(
 
 
 async def main():
-    settings = get_settings()
+    try:
+        print("🚀 main() started")
 
-    bot = Bot(token=settings.BOT_TOKEN)
+        settings = get_settings()
+        print("✅ Settings loaded")
+        print("BOT_TOKEN exists:", bool(settings.BOT_TOKEN))
 
-    dp = Dispatcher()
+        bot = Bot(token=settings.BOT_TOKEN)
+        print("✅ Bot created")
 
-    # تسجيل أوامر البوت
-    dp.include_router(start.router)
-    dp.include_router(help.router)
-    dp.include_router(download.router)
-    dp.include_router(callbacks.router)
+        dp = Dispatcher()
 
-    logging.info("🚀 Mouja Digital Bot Started")
+        dp.include_router(start.router)
+        dp.include_router(help.router)
+        dp.include_router(download.router)
+        dp.include_router(callbacks.router)
 
-    await dp.start_polling(bot)
+        print("✅ Routers loaded")
+        print("🤖 Bot is starting polling...")
+
+        await dp.start_polling(bot)
+
+    except Exception:
+        print("❌ Error while starting the bot:")
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
