@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
 
 from bot.services.downloader import download_video, download_audio
 from bot.utils.files import delete_file, get_file_size
@@ -7,9 +7,8 @@ from bot.utils.files import delete_file, get_file_size
 
 router = Router()
 
-# تخزين الروابط مؤقتًا (سيتم تطويره لاحقًا إلى قاعدة بيانات)
+# تخزين الروابط مؤقتًا
 user_links = {}
-
 
 MAX_FILE_SIZE = 50  # MB
 
@@ -44,11 +43,12 @@ async def download_video_handler(callback: CallbackQuery):
             )
             return
 
-        with open(file_path, "rb") as video:
-            await callback.message.answer_video(
-                video=video,
-                caption="✅ تم تحميل الفيديو بواسطة Mouja Digital"
-            )
+        video = FSInputFile(file_path)
+
+        await callback.message.answer_video(
+            video=video,
+            caption="✅ تم تحميل الفيديو بواسطة Mouja Digital"
+        )
 
     except Exception as e:
         await callback.message.answer(
@@ -58,8 +58,6 @@ async def download_video_handler(callback: CallbackQuery):
     finally:
         if file_path:
             delete_file(file_path)
-
-    await callback.answer()
 
 
 @router.callback_query(F.data == "download_audio")
@@ -76,7 +74,7 @@ async def download_audio_handler(callback: CallbackQuery):
         return
 
     await callback.message.answer(
-        "🎵 جاري استخراج الصوت MP3..."
+        "🎵 جاري تحميل الصوت..."
     )
 
     file_path = None
@@ -84,19 +82,12 @@ async def download_audio_handler(callback: CallbackQuery):
     try:
         file_path = download_audio(url)
 
-        size = get_file_size(file_path)
+        audio = FSInputFile(file_path)
 
-        if size > MAX_FILE_SIZE:
-            await callback.message.answer(
-                f"❌ حجم الملف كبير ({size}MB)"
-            )
-            return
-
-        with open(file_path, "rb") as audio:
-            await callback.message.answer_audio(
-                audio=audio,
-                caption="✅ تم استخراج الصوت بواسطة Mouja Digital"
-            )
+        await callback.message.answer_audio(
+            audio=audio,
+            caption="✅ تم تحميل الصوت بواسطة Mouja Digital"
+        )
 
     except Exception as e:
         await callback.message.answer(
@@ -106,5 +97,3 @@ async def download_audio_handler(callback: CallbackQuery):
     finally:
         if file_path:
             delete_file(file_path)
-
-    await callback.answer()
