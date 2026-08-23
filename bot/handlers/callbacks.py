@@ -1,3 +1,4 @@
+import os
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, FSInputFile
 
@@ -27,7 +28,7 @@ async def download_video_handler(callback: CallbackQuery):
         return
 
     await callback.message.answer(
-        "🎬 جاري تحميل الفيديو..."
+        "📥 جاري تحميل المحتوى..."
     )
 
     file_path = None
@@ -43,12 +44,27 @@ async def download_video_handler(callback: CallbackQuery):
             )
             return
 
-        video = FSInputFile(file_path)
+        file = FSInputFile(file_path)
 
-        await callback.message.answer_video(
-            video=video,
-            caption="✅ تم تحميل الفيديو بواسطة Mouja Digital"
-        )
+        extension = os.path.splitext(file_path)[1].lower()
+
+        if extension in [".jpg", ".jpeg", ".png", ".webp"]:
+            await callback.message.answer_photo(
+                photo=file,
+                caption="✅ تم تحميل الصورة بواسطة Mouja Digital"
+            )
+
+        elif extension in [".mp4", ".mov", ".mkv", ".webm"]:
+            await callback.message.answer_video(
+                video=file,
+                caption="✅ تم تحميل الفيديو بواسطة Mouja Digital"
+            )
+
+        else:
+            await callback.message.answer_document(
+                document=file,
+                caption="✅ تم تحميل الملف بواسطة Mouja Digital"
+            )
 
     except Exception as e:
         await callback.message.answer(
