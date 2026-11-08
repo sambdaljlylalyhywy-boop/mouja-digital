@@ -13,13 +13,16 @@ class SubscriptionMiddleware(BaseMiddleware):
         self.settings = settings
 
     async def __call__(self, handler, event, data):
-
         user = getattr(event, "from_user", None)
 
         if not user:
             return await handler(event, data)
 
-        # السماح بأمر البداية
+        # السماح للمشرف بتجاوز الاشتراك الإجباري
+        if user.id in self.settings.admin_ids_list:
+            return await handler(event, data)
+
+        # السماح بأمر start
         if isinstance(event, Message):
             if event.text and event.text.split()[0].split("@")[0] == "/start":
                 return await handler(event, data)
@@ -35,6 +38,7 @@ class SubscriptionMiddleware(BaseMiddleware):
                 user.id,
                 self.settings.CHANNEL_ID
             )
+
         except Exception:
             logging.exception("Subscription check failed")
 
@@ -58,7 +62,7 @@ class SubscriptionMiddleware(BaseMiddleware):
         )
 
         text = (
-            "🔒 عذرًا، يجب الاشتراك في قناتنا أولًا "
+            "🔒 يجب الاشتراك في قناتنا أولًا "
             "حتى تتمكن من استخدام البوت.\n\n"
             "اشترك ثم اضغط على زر التحقق."
         )
@@ -71,7 +75,6 @@ class SubscriptionMiddleware(BaseMiddleware):
                 "يجب الاشتراك في القناة أولًا.",
                 show_alert=True
             )
-
             if event.message:
                 await event.message.answer(
                     text,
